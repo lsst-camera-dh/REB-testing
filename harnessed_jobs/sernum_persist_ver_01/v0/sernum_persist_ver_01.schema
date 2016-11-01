@@ -1,0 +1,6 @@
+# -*- python -*-
+{
+    'schema_name' : 'sernum_persist_ver_01',
+    'schema_version' : 0,
+    'serial_number' : str
+}
