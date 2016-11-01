@@ -1,2 +1,2 @@
-# reb-testing
+# REB-testing
 REB testing harnessed jobs.
