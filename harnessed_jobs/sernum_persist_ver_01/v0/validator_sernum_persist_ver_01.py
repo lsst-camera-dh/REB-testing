@@ -1,11 +1,31 @@
 #!/usr/bin/env python
+import os
 import lcatr.schema
+import eTraveler.clientAPI.connection
+
+operator = os.environ['LCATR_OPERATOR']
+db = os.path.split(os.environ['LCATR_LIMS_URL'])[-1]
+if db not in 'Prod Dev'.split():
+    db = 'Dev'
+conn = eTraveler.clientAPI.connection.Connection(operator=operator, db=db)
 
 with open('serial_number.txt') as input_:
-    serial_number = input_.readline().strip()
+    manufacturerSN = input_.readline().strip()
+
+experimentSN = os.environ['LCATR_UNIT_ID']
+htype = os.environ['LCATR_UNIT_TYPE']
+try:
+    conn.setManufacturerId(experimentSN=experimentSN, htype=htype,
+                           manufacturerId=manufacturerSN)
+except Exception as eobj:
+    print eobj
+
+print "manufacturerSN set to", \
+    conn.getManufacturerId(experimentSN=experimentSN, htype=htype)
 
 results = [lcatr.schema.valid(lcatr.schema.get('sernum_persist_ver_01'),
-                              serial_number=serial_number)]
+                              manufacturerSN=manufacturerSN)]
+
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
