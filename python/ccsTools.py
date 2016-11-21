@@ -95,7 +95,7 @@ class CcsSetup(OrderedDict):
         commands.append('sys.path.append("%s")' % siteUtils.pythonDir())
         return commands
 
-def ccsProducer(jobName, ccsScript, ccs_system_name,
+def ccsProducer(jobName, ccsScript, ccs_system_name, config_file=None,
                 makeBiasDir=False, verbose=True):
     """
     Run the CCS data acquistion script under the CCS jython interpreter.
@@ -104,19 +104,13 @@ def ccsProducer(jobName, ccsScript, ccs_system_name,
         os.mkdir("bias")
 
     ccs = CcsJythonInterpreter(ccs_system_name)
-#    setup = CcsSetup('%s.cfg' % jobName)
-# change to using a single config from the main config directory
-    configDir = siteUtils.configDir()
-    setup = CcsSetup('%s/acq.cfg' % configDir )
+    setup = CcsSetup(config_file)
 
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
                                      verbose=verbose)
     output = open("%s.log" % jobName, "w")
     output.write(result.getOutput())
     output.close()
-
-#    print "purge fluxcal fits files"
-#    os.system("rm -v fluxcal*.fits")
 
 def convert_unix_time(millisecs):
     """
@@ -176,19 +170,18 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     except IOError:
         for flag in statusFlags:
             statusAssignments[flag] = -1
-    
 
     print "jobName = %s" % jobName
     print "schema = %s" % str(lcatr.schema.get(jobName))
 
-    results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
+    results.append(lcatr.schema.valid(lcatr.schema.get(jobName),
                                       **statusAssignments))
 
     results.append(siteUtils.packageVersions())
 
     # @todo Fix this. Copying these files should not be necessary.
 #    jobdir = siteUtils.getJobDir()
-#    os.system("cp -vp %s/*.fits ." % jobdir)   
+#    os.system("cp -vp %s/*.fits ." % jobdir)
 
     # @todo Sort out which files really need to be curated.
     files = glob.glob('*.fits')
