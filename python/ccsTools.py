@@ -56,7 +56,7 @@ class CcsSetup(OrderedDict):
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())
-        self._read(os.path.join(siteUtils.getJobDir(), configFile))
+#        self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
 #        self['acffile'] = self['itl_acffile']
