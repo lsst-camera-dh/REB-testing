@@ -32,50 +32,8 @@ class CcsSetup(OrderedDict):
         _read(...) method.
         """
         super(CcsSetup, self).__init__()
-        if os.environ.has_key('CCS_TS'):
-            self['ts']=_quote(os.getenv('CCS_TS'))
-        else:
-            self['ts'] = _quote('ts')
-        if os.environ.has_key('CCS_ARCHON'):
-            self['archon']=_quote(os.getenv('CCS_ARCHON'))
-        else:
-            self['archon'] = _quote('archon')
-        if os.environ.has_key('CCS_VAC_OUTLET'):
-            self['vac_outlet']=os.getenv('CCS_VAC_OUTLET')
-# there is no default for vac_outlet - if there is a script that needs
-# it and it has not been defined then I want it to crash
-        if os.environ.has_key('CCS_CRYO_OUTLET'):
-            self['cryo_outlet']=os.getenv('CCS_CRYO_OUTLET')
-# there is no default for cryo_outlet - if there is a script that needs
-# it and it has not been defined then I want it to crash
-        if os.environ.has_key('CCS_PUMP_OUTLET'):
-            self['pump_outlet']=os.getenv('CCS_PUMP_OUTLET')
-# there is no default for pump_outlet - if there is a script that needs
-# it and it has not been defined then I want it to crash
+        self._read(configFile)
         self['tsCWD'] = _quote(os.getcwd())
-        self['labname'] = _quote(siteUtils.getSiteName())
-        self['CCDID'] = _quote(siteUtils.getUnitId())
-        self['LSSTID'] = _quote(siteUtils.getLSSTId())
-#        self._read(os.path.join(siteUtils.getJobDir(), configFile))
-        CCDTYPE = _quote(siteUtils.getUnitType())
-        print "CCDTYPE = %s" % CCDTYPE
-#        self['acffile'] = self['itl_acffile']
-#        self['CCSCCDTYPE'] = _quote("ITL")
-#        if ("RTM" in CCDTYPE) :
-#            if ("e2v" in CCDTYPE) :
-#                self['CCSCCDTYPE'] = _quote("E2V")
-#                self['acffile'] = self['e2v_acffile']
-#            else :
-#                self['CCSCCDTYPE'] = _quote("ITL")
-#                self['acffile'] = self['itl_acffile']
-#        else :
-#            if ("ITL" in CCDTYPE) :
-#                self['CCSCCDTYPE'] = _quote("ITL")
-#                self['acffile'] = self['itl_acffile']
-#            if ("e2v" in CCDTYPE) :
-#                self['CCSCCDTYPE'] = _quote("E2V")
-#                self['acffile'] = self['e2v_acffile']
-#        print "The acffile to be used is %s" % self['acffile']
 
     def _read(self, configFile):
         if configFile is None:
@@ -84,6 +42,7 @@ class CcsSetup(OrderedDict):
         for line in open(configFile):
             key, value = line.strip().split("=")
             self[key.strip()] = _quote(os.path.realpath(os.path.join(configDir, value.strip())))
+
     def __call__(self):
         """
         Return the setup commands for the CCS script.
