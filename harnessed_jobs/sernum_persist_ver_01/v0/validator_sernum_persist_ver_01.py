@@ -28,4 +28,3 @@ results = [lcatr.schema.valid(lcatr.schema.get('sernum_persist_ver_01'),
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
-
