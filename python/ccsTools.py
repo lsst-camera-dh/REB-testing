@@ -12,7 +12,7 @@ else:
     from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import hdrtools
-from DbInterface import DbInterface
+#from DbInterface import DbInterface
 import lcatr.schema
 
 _quote = lambda x : "'%s'" % x
