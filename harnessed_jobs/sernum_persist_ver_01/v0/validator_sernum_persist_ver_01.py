@@ -1,27 +1,19 @@
 #!/usr/bin/env python
 import os
 import lcatr.schema
-import eTraveler.clientAPI.connection
+import lcatr.harness.et_wrapper
+import rebUtils
 
-operator = os.environ['LCATR_OPERATOR']
-db = os.path.split(os.environ['LCATR_LIMS_URL'])[-1]
-if db not in 'Prod Dev'.split():
-    db = 'Dev'
-conn = eTraveler.clientAPI.connection.Connection(operator=operator, db=db)
+ccs_subsystem = 'ccs-reb4'
 
-with open('serial_number.txt') as input_:
-    manufacturerSN = input_.readline().strip()
-
-experimentSN = os.environ['LCATR_UNIT_ID']
-htype = os.environ['LCATR_UNIT_TYPE']
+manufacturerSN = get_serial_number_from_board(ccs_subsystem=ccs_subsystem)
 try:
-    conn.setManufacturerId(experimentSN=experimentSN, htype=htype,
-                           manufacturerId=manufacturerSN)
+    lcatr.harness.et_wrapper.setManufacturerId(manufacturerId=manufacturerSN)
 except Exception as eobj:
     print eobj
 
-print "manufacturerSN set to", \
-    conn.getManufacturerId(experimentSN=experimentSN, htype=htype)
+rebUtils.check_serial_number(ccs_subsystem=ccs_subsystem)
+print "manufacturerSN set to", manufacturerSN
 
 results = [lcatr.schema.valid(lcatr.schema.get('sernum_persist_ver_01'),
                               manufacturerSN=manufacturerSN)]
