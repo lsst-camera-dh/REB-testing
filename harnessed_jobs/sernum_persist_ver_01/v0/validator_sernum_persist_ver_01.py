@@ -7,7 +7,8 @@ import rebUtils
 
 ccs_subsystem = 'ccs-reb4'
 
-manufacturerSN = get_serial_number_from_board(ccs_subsystem=ccs_subsystem)
+manufacturerSN = \
+    rebUtils.get_serial_number_from_board(ccs_subsystem=ccs_subsystem)
 try:
 #    lcatr.harness.et_wrapper.setManufacturerId(manufacturerId=manufacturerSN)
     rebUtils.setManufacturerId(manufacturerId=manufacturerSN)
