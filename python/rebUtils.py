@@ -1,9 +1,32 @@
 """
 Utilities for REB-testing harnessed jobs.
 """
-import lcatr.harness.et_wrapper
+import os
+#import lcatr.harness.et_wrapper
+import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
+
+def get_eT_connection():
+    operator = os.environ['LCATR_OPERATOR']
+    db = os.path.split(os.environ['LCATR_LIMS_URL'])[-1]
+    if db not in 'Prod Dev'.split():
+        # This case occurs when using the fake_eT server, so set db to 'Dev'.
+        db = 'Dev'
+    return eTraveler.clientAPI.connection.Connection(operator=operator, db=db)
+
+def setManufacturerId(manufacturerId):
+    conn = get_eT_connection()
+    experimentSN = os.environ['LCATR_UNIT_ID']
+    htype = os.environ['LCATR_UNIT_TYPE']
+    conn.setManufacturerId(experimentSN=experimentSN, htype=htype,
+                           manufacturerId=manufacturerId)
+
+def getManufacturerId():
+    conn = get_eT_connection()
+    experimentSN = os.environ['LCATR_UNIT_ID']
+    htype = os.environ['LCATR_UNIT_TYPE']
+    return conn.getManufacturerId(experimentSN=experimentSN, htype=htype)
 
 class RebTestingException(RuntimeError):
     "REB-testing exception class"
@@ -15,7 +38,8 @@ def check_serial_number(ccs_subsystem, board='REB0'):
     CCS versus the manufacturerId in the eTraveler tables.
     """
     sn_board = get_serial_number_from_board(ccs_subsystem, board=board)
-    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
+#    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
+    sn_eT = getManufacturerId()
 
     if sn_board != sn_eT:
         message = """The serial number of the installed REB, %s,
