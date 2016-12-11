@@ -3,7 +3,6 @@ import os
 import glob
 import subprocess
 from collections import OrderedDict
-import lcatr.schema
 
 class TsRebException(RuntimeError):
     pass
@@ -28,7 +27,7 @@ class TsRebProducts(object):
         if len(parsed_dirname) != 6 and len(parsed_dirname) != 4:
             raise TsRebException("Bad rebtest dirname: %s" % dirname)
 
-        cmd = "cp -rva " + data_lst + " " + os.getcwd()
+        cmd = "cp -ra " + data_lst + " " + os.getcwd()
         subprocess.check_call(cmd, shell=True)
 
         self.pdf_report = glob.glob(os.path.join(dirname, "*.pdf"))
@@ -48,13 +47,13 @@ class TsRebProducts(object):
                 ret_dict["version_" + lsplit[0]] = lsplit[1].strip()
         return ret_dict
 
-    def _parse_tex_file(self)
+    def _parse_tex_file(self):
         summary_table = []
         in_table = False
         in_section = False
 
         with open(self.tex_file, "r") as fp:
-            for l in f.readlines():
+            for l in fp:
                 if "\\bottomrule" in l and in_table and in_section:
                     break
 
@@ -87,7 +86,9 @@ class TsRebProducts(object):
         return lst
 
 if __name__ == "__main__":
-    tsreb_products = TsRebProducts(reb_id)
+    import lcatr.schema
+
+    tsreb_products = TsRebProducts()
 
     results = [lcatr.schema.fileref.make(item)
                for item in tsreb_products.get_file_list()]
