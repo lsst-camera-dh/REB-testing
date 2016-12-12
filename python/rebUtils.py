@@ -46,6 +46,7 @@ def check_serial_number(ccs_subsystem, board='REB0'):
 does not match the value in the eTraveler
 database tables for hardware item %s.""" % (sn_board, siteUtils.getUnitId())
         raise RebTestingException(message)
+    return sn_board
 
 def get_serial_number_from_board(ccs_subsystem, board='REB0'):
     """
