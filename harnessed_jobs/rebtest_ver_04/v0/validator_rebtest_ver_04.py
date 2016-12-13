@@ -11,7 +11,7 @@ class TsRebProducts(object):
     "Class to aggregate and parse data products from rebtest code."
     def __init__(self, reb_id=None):
         if reb_id is None:
-            self.reb_id = int(os.environ["LCATR_UNIT_ID"].split("-")[1])
+            self.reb_id = int(os.environ["LCATR_UNIT_ID"].split("-")[-1])
         else:
             self.reb_id = int(reb_id)
         self._get_files()
