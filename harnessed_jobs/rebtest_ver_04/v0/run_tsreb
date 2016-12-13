@@ -1,0 +1,4 @@
+#!/bin/bash
+arg=$1
+source /opt/lsst/setup_tsreb
+/opt/lsst/rebtest/bin/tsreb_wizard --reb-sn $arg --data-path ./
