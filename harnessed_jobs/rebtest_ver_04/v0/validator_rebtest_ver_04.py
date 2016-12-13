@@ -17,7 +17,7 @@ class TsRebProducts(object):
         self._get_files()
 
     def _get_files(self):
-        cmd = "ls -rtd /data/reb_%s_* | tail -1" % self.reb_id
+        cmd = "ls -rtd /scratch/ccs/tmp/reb_data/reb_%s_* | tail -1" % self.reb_id
         data_lst = subprocess.check_output(cmd, shell=True).strip()
         if not data_lst:
             raise TsRebException("No rebtest data products found.")
