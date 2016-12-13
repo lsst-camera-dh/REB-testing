@@ -27,9 +27,6 @@ class TsRebProducts(object):
         if len(parsed_dirname) != 6 and len(parsed_dirname) != 4:
             raise TsRebException("Bad rebtest dirname: %s" % dirname)
 
-        cmd = "cp -ra " + data_lst + " " + os.getcwd()
-        subprocess.check_call(cmd, shell=True)
-
         self.pdf_report = glob.glob(os.path.join(dirname, "*.pdf"))
         self.raw_data = glob.glob(os.path.join(dirname, "data", "*.csv"))
         self.raw_data.extend(glob.glob(os.path.join(dirname, "data", "*.fits")))
