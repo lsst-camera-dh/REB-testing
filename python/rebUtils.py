@@ -7,6 +7,9 @@ import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
 
+def get_ccs_subsystem():
+    raise NotImplemented("This function is not implemented.")
+
 def get_eT_connection():
     operator = os.environ['LCATR_OPERATOR']
     db = os.path.split(os.environ['LCATR_LIMS_URL'])[-1]
