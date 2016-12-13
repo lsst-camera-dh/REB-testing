@@ -1,3 +1,3 @@
 #%Module1.0 #-*-tcl-*-#
 source "$::env(LCATR_MODULES)/lcatr.tcl"
-lcatr_package producer_flash_reb_firmware_ver_04.py validator_flash_reb_firmware_ver_01.py
+lcatr_package producer_flash_reb_firmware_ver_04.py validator_flash_reb_firmware_ver_04.py
