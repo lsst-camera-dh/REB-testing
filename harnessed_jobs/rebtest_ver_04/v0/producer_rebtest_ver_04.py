@@ -6,8 +6,7 @@ import subprocess
 run_tsreb = os.path.join(os.environ['REBTESTINGDIR'], 'harnessed_jobs',
                          'rebtest_ver_04', 'v0', 'run_tsreb')
 reb_id = os.environ["LCATR_UNIT_ID"].split('-')[-1]
-command = \
-    "/usr/bin/gnome-terminal --command='%(run_tsreb)s %(reb_id)s'" % locals()
+command = '%(run_tsreb)s %(reb_id)s' % locals()
 print(command)
 
 try:
