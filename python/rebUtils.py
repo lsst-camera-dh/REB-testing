@@ -2,7 +2,6 @@
 Utilities for REB-testing harnessed jobs.
 """
 import os
-#import lcatr.harness.et_wrapper
 import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
@@ -38,7 +37,6 @@ def check_serial_number(ccs_subsystem, board='REB0'):
     CCS versus the manufacturerId in the eTraveler tables.
     """
     sn_board = get_serial_number_from_board(ccs_subsystem, board=board)
-#    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
     sn_eT = getManufacturerId()
 
     if sn_board != sn_eT:
