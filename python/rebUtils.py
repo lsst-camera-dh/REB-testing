@@ -7,8 +7,24 @@ import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
 
-def get_ccs_subsystem():
-    raise NotImplemented("This function is not implemented.")
+def get_ccs_subsystem(subsystems):
+    """
+    Poll the specified CCS subsystems to see if the REB under test
+    is attached.
+
+    Returns
+    -------
+    str
+        The name of the CCS subsystem with the desired REB attached.
+    """
+    for item in subsystems:
+        try:
+            check_serial_number(item)
+            return item
+        except RebTestingException:
+            pass
+    message = "No CCS subsystem found for REB %s." % siteUtils.getUnitId()
+    raise RebTestingException(message)
 
 def get_eT_connection():
     operator = os.environ['LCATR_OPERATOR']
