@@ -10,9 +10,7 @@ import rebUtils
 subsystems = ['ccs-reb5-%i' % i for i in range(3)]
 ccs_subsystem = rebUtils.get_ccs_subsystem(subsystems)
 
-burn_in_script = os.path.join(os.environ['REBTESTINGDIR'], 'harnessed_jobs',
-                              'reb_burn_in_ver_03', 'v0', 'burn_in_script')
-outfile = 'burn_in_script_output.txt'
+burn_in_script = '/lsst/ccs/REBtest/REB5Test.py'
 command = "%(burn_in_script)s %(ccs_subsystem)s > %(outfile)s" % locals()
 print(command)
 
