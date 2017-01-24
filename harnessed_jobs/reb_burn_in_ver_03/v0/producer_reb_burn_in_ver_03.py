@@ -46,14 +46,11 @@ config_file = os.path.join(os.environ['REBTESTINGDIR'], 'data',
 config = ccs_trending.ccs_trending_config(config_file)
 
 print("Making trending plots:")
-local_time = ccs_trending.TimeAxis.local_time().isoformat()
+local_time = ccs_trending.TimeAxis.local_time().isoformat()[:len('2017-01-24T10:44:00')]
 for section in config.sections():
     print("  processing", section)
     plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
                                            time_axis=time_axis)
     plotter.read_config(config, section)
-    y_range = None
-    if section == 'Temperature':
-        yrange = (-30, 90)
-    plotter.plot(y_range=y_range)
+    plotter.plot()
     plt.savefig('%s_%s_%s.png' % (section, local_time, siteUtils.getUnitId()))
