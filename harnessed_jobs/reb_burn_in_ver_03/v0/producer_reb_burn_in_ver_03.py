@@ -7,6 +7,7 @@ import os
 import shutil
 import socket
 import subprocess
+import time
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -20,19 +21,17 @@ results_file = 'burn_in_script_output.txt'
 with open(results_file, 'w') as output:
     output.write(ccs_subsystem + '\n')
 
-burn_in_script = 'REB5Test.py'
-cwd = os.path.abspath('.')
-
-command = "cd /lsst/ccs/REBtest; python %(burn_in_script)s -n -v -C %(ccs_subsystem)s %(cwd)s" % locals()
-print(command)
-
-subprocess.check_call(command, shell=True, executable='/bin/bash')
-
-# Create a hard link to the pdf to the cwd for persisting by the
-# validator script.
-pdf_report = subprocess.check_output('find . -name \*.pdf -print',
-                                     shell=True).rstrip()
-os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
+ntries = 5
+wait_time = 60
+for i in range(ntries):
+    try:
+        rebUtils.run_REB5Test_script(ccs_subsystem)
+        break
+    except subprocess.CalledProcessError as eobj:
+        print(str(eobj))
+        print("  Try # %i. Waiting %i seconds for next try." % (i, wait_time))
+        time.sleep(wait_time)
+        pass
 
 #fake_report = '/lsst/ccs/tmp/jh_stage/LCA-13574/LCA-13574-010/reb_burn_in_ver_03/v0/5/REB5_Test_17.01.23.22.34_0x189223c1/REB5_Test_17.01.23.22.34_0x189223c1.pdf'
 #print("fake the execution of REB5Test.py, copying the report", fake_report)

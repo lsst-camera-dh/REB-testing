@@ -3,6 +3,7 @@ Utilities for REB-testing harnessed jobs.
 """
 from __future__ import print_function
 import os
+import subprocess
 #import lcatr.harness.et_wrapper
 import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
@@ -92,3 +93,20 @@ output.close()
         serial_number = input_.readline().strip()
     os.remove(temp_file)
     return serial_number
+
+def run_REB5Test_script(ccs_subsystem, script_dir='/lsst/ccs/REBtest',
+                        script_name='REB5Test.py'):
+    """
+    Run REB5 test script use for REB burn-in and thermal cycling tests.
+    """
+    cwd = os.path.abspath('.')
+    command = "cd %(script_dir)s; python %(script_name)s -n -v -C %(ccs_subsystem)s %(cwd)s" % locals()
+    print(command)
+
+    subprocess.check_call(command, shell=True, executable='/bin/bash')
+
+    # Create a hard link to the pdf to the cwd for persisting by the
+    # validator script.
+    pdf_report = subprocess.check_output('find . -name \*.pdf -print',
+                                         shell=True).rstrip()
+    os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
