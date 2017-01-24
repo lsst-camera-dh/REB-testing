@@ -1,16 +1,40 @@
 """
 Module to access CCS trending database via the RESTful interface.
 """
+from __future__ import absolute_import, print_function
 import xml.dom.minidom as minidom
 import time
 import datetime
+from collections import OrderedDict
+import ConfigParser
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mds
 
 __all__ = ['Channels', 'RestUrl', 'TimeAxis', 'TrendingPlotter',
-           'TrendingHistory', 'TrendingPoint']
+           'TrendingHistory', 'TrendingPoint', 'ccs_trending_config']
+
+
+def ccs_trending_config(config_file):
+    """
+    Read the config file to get the quantities to be retrieved from
+    the trending database.
+
+    Parameters
+    ----------
+    config_file : str
+        Configuration file with sections listing the desired trending
+        quantities.
+
+    Returns
+    -------
+    ConfigParser.SafeConfigParser
+    """
+    cp = ConfigParser.SafeConfigParser()
+    cp.optionxform = str
+    cp.read(config_file)
+    return cp
 
 
 def date_time(msec):
@@ -71,6 +95,7 @@ class RestUrl(object):
             url = self.time_axis.append_axis_info(url)
         return url
 
+
 class TimeAxis(object):
     """
     Abstraction of the time axis information for CCS trending plots.
@@ -123,24 +148,93 @@ class TimeAxis(object):
         return time.mktime(dt.timetuple())
 
 
+class TrendingPlotterException(RuntimeError):
+    pass
+
+
 class TrendingPlotter(object):
+    """
+    Class to plot and persist quantities from the CCS trending database.
+    """
     def __init__(self, subsystem, host, time_axis=None):
         self.subsystem = subsystem
         self.host = host
         self.rest_url = RestUrl(subsystem, host=host, time_axis=time_axis)
+        self.histories = OrderedDict()
 
-    def plot(self, quantities):
+    def read_config(self, config, section):
+        """
+        Read the list of quantities from the requested section of the
+        config object and read the trending histories from the database.
+        """
+        items = OrderedDict(config.items(section))
+        self.y_label = '%s (%s)' % (section, items.pop('units'))
+        self._read_histories(items.values())
+
+    def _read_histories(self, quantities):
+        for quantity in quantities:
+            self.histories[quantity] = TrendingHistory(self.rest_url(quantity))
+
+    def save_file(self, outfile):
+        """
+        Save the trending quantities to a text file.
+        """
+        # Create a numpy array object with the data
+        header_items = ["timestamp"]
+        data = [self.histories.values()[0].x_values]
+        for quantity, history in self.histories.items():
+            header_items.extend((quantity, 'error'))
+            data.extend((history.y_values, history.y_errors))
+        data = np.array(data).transpose()
+        header = ' '.join(header_items)
+        np.savetxt(outfile, data, fmt=['%s'] + ['%.4e']*(data.shape[1]-1),
+                   header=header)
+
+    def plot(self, x_range=None, y_range=None, y_label=None,
+             title=None, legendfontsize='x-small'):
+        """
+        Plot the trending quantities as a function of time.
+        """
+        if len(self.histories) == 0:
+            raise TrendingPlotterException("No trending histories loaded.")
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        for quantity in quantities:
-            history = TrendingHistory(self.rest_url(quantity))
+        for quantity, history in self.histories.items():
             ax.errorbar(mds.date2num(history.x_values), history.y_values,
                         yerr=history.y_errors, fmt='.', label=quantity)
-        plt.legend()
         frame = plt.gca()
         frame.xaxis.set_major_formatter(mds.DateFormatter('%y-%m-%d\n%H:%M:%S'))
+        ax.tick_params(axis='x', which='major', labelsize='small')
+        self.set_x_range(x_range=x_range)
+        self.set_y_range(y_range=y_range)
+        plt.xlabel('local time')
+        if y_label is None:
+            y_label = self.y_label
+        plt.ylabel(y_label)
+        if title is None:
+            title = '%s, %s' % (self.host, self.subsystem)
+        plt.title(title)
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width*0.85, box.height])
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1.01),
+                  fontsize=legendfontsize)
         return fig
 
+    @staticmethod
+    def set_x_range(x_range=None):
+        if x_range is None:
+            return
+        axis = list(plt.axis())
+        axis[:2] = x_range[0], x_range[1]
+        plt.axis(axis)
+
+    @staticmethod
+    def set_y_range(y_range=None):
+        if y_range is None:
+            return
+        axis = list(plt.axis())
+        axis[2:] = y_range[0], y_range[1]
+        plt.axis(axis)
 
 class TrendingHistory(object):
     def __init__(self, url):
@@ -202,15 +296,17 @@ if __name__ == '__main__':
     plt.ion()
     host = 'tid-pc93482'
     subsystem = 'ccs-reb5-0'
-    time_axis = TimeAxis(dt=3, nbins=10)
-    quantities = ('REB0.Temp1', 'REB0.Temp2', 'REB0.Temp3')
+    time_axis = TimeAxis(dt=24, nbins=100)
 
-    rest_url = RestUrl(subsystem, host=host, time_axis=time_axis)
-    for quantity in quantities:
-        url = rest_url(quantity)
-
-    foo = TrendingHistory(url)
-    print foo.x_values, foo.y_values
-
-#    plotter = TrendingPlotter(subsystem, host, time_axis=time_axis)
-#    plotter.plot(quantities)
+    plot_config = ccs_trending_config('REB_trending_plot.cfg')
+    figs = {}
+    for section in plot_config.sections()[:1]:
+        print("processing", section)
+        plotter = TrendingPlotter(subsystem, host, time_axis=time_axis)
+        plotter.read_config(plot_config, section)
+        plotter.save_file('%s.txt' % section.replace(' ', '_'))
+#        y_range = None
+#        if section == 'Temperature':
+#            y_range = (-30, 90)
+#        figs[section] = plotter.plot(y_range=y_range)
+##        plt.savefig('%s.png' % section.replace(' ', '_'))
