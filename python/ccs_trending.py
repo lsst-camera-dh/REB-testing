@@ -118,7 +118,7 @@ class TimeAxis(object):
             server if not given.
         """
         self.start = self._convert_iso_8601(start)
-        self.end = self._convert_iso_8601(start)
+        self.end = self._convert_iso_8601(end)
         if self.start is None:
             if self.end is None:
                 self.end = time.mktime(datetime.datetime.now().timetuple())
