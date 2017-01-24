@@ -4,6 +4,7 @@ Producer script for reb_burn_in_ver_03 harnessed job.
 """
 from __future__ import print_function
 import os
+import sys
 import shutil
 import socket
 import subprocess
@@ -30,6 +31,7 @@ for i in range(ntries):
     except subprocess.CalledProcessError as eobj:
         print(str(eobj))
         print("  Try # %i. Waiting %i seconds for next try." % (i, wait_time))
+        sys.stdout.flush()
         time.sleep(wait_time)
         pass
 
