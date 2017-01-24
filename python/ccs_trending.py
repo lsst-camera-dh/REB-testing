@@ -2,6 +2,7 @@
 Module to access CCS trending database via the RESTful interface.
 """
 from __future__ import absolute_import, print_function
+import os
 import xml.dom.minidom as minidom
 import time
 import datetime
@@ -31,6 +32,9 @@ def ccs_trending_config(config_file):
     -------
     ConfigParser.SafeConfigParser
     """
+    if not os.path.isfile(config_file):
+        raise RuntimeError("ccs_trending_config -- File not found: %s"
+                           % config_file)
     cp = ConfigParser.SafeConfigParser()
     cp.optionxform = str
     cp.read(config_file)
@@ -121,11 +125,15 @@ class TimeAxis(object):
         self.end = self._convert_iso_8601(end)
         if self.start is None:
             if self.end is None:
-                self.end = time.mktime(datetime.datetime.now().timetuple())
+                self.end = time.mktime(self.local_time().timetuple())
             self.start = self.end - dt*3600.
         elif self.end is None:
             self.end = self.start + dt*3600.
         self.nbins = nbins
+
+    @staticmethod
+    def local_time():
+        return datetime.datetime.now()
 
     def append_axis_info(self, url):
         """Append time axis info to the REST url."""
