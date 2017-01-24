@@ -1,3 +1,0 @@
-#!/bin/bash
-ccs_subsystem=$1
-echo $ccs_subsystem
