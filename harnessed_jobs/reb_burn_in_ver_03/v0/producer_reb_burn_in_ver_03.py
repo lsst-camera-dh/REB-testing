@@ -16,36 +16,36 @@ import rebUtils
 import ccs_trending
 import file_signal_handler
 
-
 subsystems = ['ccs-reb5-%i' % i for i in range(3)]
 ccs_subsystem = rebUtils.get_ccs_subsystem(subsystems)
 results_file = 'burn_in_script_output.txt'
 with open(results_file, 'w') as output:
     output.write(ccs_subsystem + '\n')
 
-#
-# Loop indefinitely until signal_file is detected.
-#
-signal_file = os.path.join(os.environ['LCATR_STAGE_ROOT'],
-                           'reb_signal_%s.txt' % os.environ['LCATR_JOB_ID'])
-signal_handler = file_signal_handler.FileSignalHandler(signal_file)
-# 5 hours between reports
-report_interval = 5*3600.
-while True:
-    ntries = 5
-    wait_time = 60
-    for i in range(ntries):
-        try:
-#            rebUtils.run_REB5Test_script(ccs_subsystem)
-            rebUtils.run_fake_REB5Test_script(ccs_subsystem)
-            break
-        except subprocess.CalledProcessError as eobj:
-            print(str(eobj))
-            print("  Try # %i. Waiting %i seconds for next try."
-                  % (i, wait_time))
-            sys.stdout.flush()
-            time.sleep(wait_time)
-    signal_handler.wait(report_interval)
+# Loop indefinitely until the signal file is detected.
+signal_handler = file_signal_handler.FileSignalHandler()
+# 6 hours between reports
+report_interval = 6.*60.*60.
+#report_interval = 10.*60.
+print("Generating REB5 test reports every %.2f hours" % (report_interval/3600.))
+try:
+    while True:
+        ntries = 5
+        wait_time = 60   # interval between retries
+        for i in range(ntries):
+            try:
+                rebUtils.run_REB5Test_script(ccs_subsystem)
+#                rebUtils.run_fake_REB5Test_script(ccs_subsystem)
+                break
+            except subprocess.CalledProcessError as eobj:
+                print(str(eobj))
+                print("  Try # %i. Waiting %i seconds for next try."
+                      % (i, wait_time))
+                sys.stdout.flush()
+                time.sleep(wait_time)
+        signal_handler.wait(report_interval)
+except file_signal_handler.FileSignalHandlerException:
+    pass
 
 # Make trending plots
 host = socket.gethostname()

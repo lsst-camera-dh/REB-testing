@@ -18,15 +18,16 @@ class FileSignalHandler(object):
         Path of the signal file.  It must be of the form
         <dirname>/<filename>, and <dirname> must exist.
     """
-    def __init__(self, signal_file):
+    def __init__(self, signal_file=None):
         """
         Constructor.
 
         Parameters
         ----------
-        signal_file : str
+        signal_file : str, optional
             Path of the signal file.  It must be of the form
             <dirname>/<filename>, and <dirname> must exist.
+            If None, then it is set to '/tmp/hj_signal_<job_id>.txt'
 
         Raises
         ------
@@ -36,6 +37,10 @@ class FileSignalHandler(object):
         RuntimeError:
             Raised if the signal file already exists.
         """
+        if signal_file is None:
+            signal_file \
+                = os.path.join('/tmp',
+                               'hj_signal_%s.txt' % os.environ['LCATR_JOB_ID'])
         # Ensure a reasonable path (i.e., not in system root) is given
         # and that the directory exists.
         dirname = os.path.dirname(signal_file)
