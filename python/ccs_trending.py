@@ -8,10 +8,10 @@ import time
 import datetime
 from collections import OrderedDict
 import ConfigParser
-import requests
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mds
+import requests
 
 __all__ = ['Channels', 'RestUrl', 'TimeAxis', 'TrendingPlotter',
            'TrendingHistory', 'TrendingPoint', 'ccs_trending_config']
@@ -169,6 +169,7 @@ class TrendingPlotter(object):
         self.host = host
         self.rest_url = RestUrl(subsystem, host=host, time_axis=time_axis)
         self.histories = OrderedDict()
+        self.y_label = ''
 
     def read_config(self, config, section):
         """

@@ -3,6 +3,7 @@ Utilities for REB-testing harnessed jobs.
 """
 from __future__ import print_function
 import os
+import datetime
 import subprocess
 #import lcatr.harness.et_wrapper
 import eTraveler.clientAPI.connection
@@ -110,3 +111,19 @@ def run_REB5Test_script(ccs_subsystem, script_dir='/lsst/ccs/REBtest',
     pdf_report = subprocess.check_output('find . -name \*.pdf -print',
                                          shell=True).rstrip()
     os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
+
+def run_fake_REB5Test_script(ccs_subsystem):
+    """
+    Create a fake REB5 Test report.
+    """
+    fake_report = 'REB5_Test_fake_report_%s.pdf' % local_time()
+    print("Faking the execution of REB5Test.py, creating the report",
+          fake_report)
+    with open(fake_report, 'a'):
+        os.utime(fake_report, None)
+
+def local_time():
+    """
+    Return the current local time in ISO-8601 format.
+    """
+    return datetime.datetime.now().isoformat()[:len('2017-01-24T10:44:00')]

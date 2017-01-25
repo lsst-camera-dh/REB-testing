@@ -75,6 +75,7 @@ class FileSignalHandler(object):
             raise ValueError("num_loops computed to be < 1 for int(%s/%s)"
                              % (wait_interval, poll_interval))
         slop = wait_interval - num_loops*poll_interval
+        i = 0
         for i in range(num_loops):
             time.sleep(poll_interval)
             if os.path.isfile(self.signal_file):
