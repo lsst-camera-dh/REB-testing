@@ -189,7 +189,7 @@ class TrendingPlotter(object):
         Save the trending quantities to a text file.
         """
         # Create a numpy array object with the data
-        header_items = ["timestamp"]
+        header_items = ["date", "time"]
         data = [self.histories.values()[0].x_values]
         for quantity, history in self.histories.items():
             header_items.extend((quantity, 'error'))
@@ -303,11 +303,11 @@ class TrendingPoint(object):
 
 if __name__ == '__main__':
     plt.ion()
-    host = 'tid-pc93482'
+    host = 'tid-pc93480'
     subsystem = 'ccs-reb5-0'
     time_axis = TimeAxis(dt=24, nbins=100)
 
-    plot_config = ccs_trending_config('REB_trending_plot.cfg')
+    plot_config = ccs_trending_config('../data/REB_trending_plot.cfg')
     figs = {}
     for section in plot_config.sections()[:1]:
         print("processing", section)

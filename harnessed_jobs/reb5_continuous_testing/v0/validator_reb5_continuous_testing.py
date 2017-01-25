@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Validator script for reb_burn_in_ver_03 harnessed job.
+Validator script for reb5_continuous_testing.
 """
 from __future__ import absolute_import, print_function
 import glob
@@ -8,15 +8,14 @@ import lcatr.schema
 from lcatr.schema import fileref
 import siteUtils
 
-results_file = 'burn_in_script_output.txt'
+results_file = 'ccs_subsystem_info.txt'
 with open(results_file) as input_:
     ccs_subsystem = input_.readline().strip()
 
-results = [lcatr.schema.valid(lcatr.schema.get('reb_burn_in_ver_03'),
+results = [lcatr.schema.valid(lcatr.schema.get('reb5_continuous_testing'),
                               ccs_subsystem=ccs_subsystem)]
 
-md = siteUtils.DataCatalogMetadata(LSST_NUM=siteUtils.getUnitId(),
-                                   producer='SR-REB-VER-03')
+md = siteUtils.DataCatalogMetadata(LSST_NUM=siteUtils.getUnitId())
 
 for pdf_report in glob.glob('REB5*.pdf'):
     results.append(fileref.make(pdf_report,
@@ -25,6 +24,11 @@ for pdf_report in glob.glob('REB5*.pdf'):
 for png_file in glob.glob('*.png'):
     dp_name = png_file.split('_')[0] + '_plot'
     results.append(fileref.make(png_file,
+                                metadata=md(DATA_PRODUCT=dp_name)))
+
+for text_file in glob.glob('*.txt'):
+    dp_name = text_file.split('_')[0] + '_plot_data'
+    results.append(fileref.make(text_file,
                                 metadata=md(DATA_PRODUCT=dp_name)))
 
 lcatr.schema.write_file(results)

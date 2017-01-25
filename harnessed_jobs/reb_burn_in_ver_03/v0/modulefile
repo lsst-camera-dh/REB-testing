@@ -1,3 +1,0 @@
-#%Module1.0 #-*-tcl-*-#
-source "$::env(LCATR_MODULES)/lcatr.tcl"
-lcatr_package producer_reb_burn_in_ver_03.py validator_reb_burn_in_ver_03.py

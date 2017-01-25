@@ -3,12 +3,18 @@ Utilities for REB-testing harnessed jobs.
 """
 from __future__ import print_function
 import os
+import sys
 import datetime
 import subprocess
+import socket
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 #import lcatr.harness.et_wrapper
 import eTraveler.clientAPI.connection
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
+import ccs_trending
 
 def get_ccs_subsystem(subsystems):
     """
@@ -62,6 +68,7 @@ def check_serial_number(ccs_subsystem, board='REB0'):
     sn_board = get_serial_number_from_board(ccs_subsystem, board=board)
     print("ccs subsystem:", ccs_subsystem)
     print("manufacturer's S/N from board:", sn_board)
+    sys.stdout.flush()
 #    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
     sn_eT = getManufacturerId()
 
@@ -95,30 +102,39 @@ output.close()
     os.remove(temp_file)
     return serial_number
 
-def run_REB5Test_script(ccs_subsystem, script_dir='/lsst/ccs/REBtest',
+def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
+                        script_dir='/lsst/ccs/REBtest',
                         script_name='REB5Test.py'):
     """
     Run REB5 test script use for REB burn-in and thermal cycling tests.
     """
+    # Run fake test for debugging if desired.
+    if os.environ.has_key('LCATR_REB5_FAKE_TEST'):
+        run_fake_REB5Test_script()
+        return
     cwd = os.path.abspath('.')
     command = "cd %(script_dir)s; python %(script_name)s -n -v -C %(ccs_subsystem)s %(cwd)s" % locals()
     print(command)
+    sys.stdout.flush()
+    for i in range(ntries):
+        try:
+            subprocess.check_call(command, shell=True, executable='/bin/bash')
+            break
+        except subprocess.CalledProcessError as eobj:
+            # Create a hard link to the pdf to the cwd for persisting
+            # by the validator script.
+            pdf_report = subprocess.check_output('find . -name \*.pdf -print',
+                                                 shell=True).rstrip()
+            os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
 
-    subprocess.check_call(command, shell=True, executable='/bin/bash')
-
-    # Create a hard link to the pdf to the cwd for persisting by the
-    # validator script.
-    pdf_report = subprocess.check_output('find . -name \*.pdf -print',
-                                         shell=True).rstrip()
-    os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
-
-def run_fake_REB5Test_script(ccs_subsystem):
+def run_fake_REB5Test_script():
     """
     Create a fake REB5 Test report.
     """
     fake_report = 'REB5_Test_fake_report_%s.pdf' % local_time()
     print("Faking the execution of REB5Test.py, creating the report",
           fake_report)
+    sys.stdout.flush()
     with open(fake_report, 'a'):
         os.utime(fake_report, None)
 
@@ -127,3 +143,59 @@ def local_time():
     Return the current local time in ISO-8601 format.
     """
     return datetime.datetime.now().isoformat()[:len('2017-01-24T10:44:00')]
+
+def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
+                            nbins=None, config_file=None):
+    """
+    Make trending plots.
+
+    Parameters
+    ----------
+    ccs_subsystem : str
+        CCS subsystem name, e.g., 'ccs-reb5-0'.
+    dt : float, optional
+        Duration of time axis in hours.  Ignored if both start and
+        end are given.  Default: 24.
+    start : str, optional
+        Start of time interval. ISO-8601 format, e.g., "2017-01-21T09:58:01"
+    end : str, optional
+        End of time interval. ISO-8601 format.
+    nbins : int, optional
+        Number of bins for time axis.  Automatically chosen by RESTful
+        server if not given.
+    config_file : str, optional
+        Configuration file listing the trending quantities to plot.
+        If None (default), then use the config file in
+        REB-testing/data/REB_trending_plot.cfg.
+
+    Notes
+    -----
+    This function writes the trending plots as png files in the cwd.
+    The filenames are of the form
+    <trending quantity>_<local time>_<LSST SN>.png.
+    """
+    host = socket.gethostname()
+    time_axis = ccs_trending.TimeAxis(dt=dt, start=start, end=end, nbins=nbins)
+    if config_file is None:
+        config_file = os.path.join(os.environ['REBTESTINGDIR'], 'data',
+                                   'REB_trending_plot.cfg')
+    config = ccs_trending.ccs_trending_config(config_file)
+
+    print("Making trending plots:")
+    for section in config.sections():
+        print("  processing", section)
+        sys.stdout.flush()
+        plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
+                                               time_axis=time_axis)
+        plotter.read_config(config, section)
+        try:
+            plotter.plot()
+            plt.savefig('%s_%s_%s.png' % (section, local_time(),
+                                          siteUtils.getUnitId()))
+        except StandardError as eobj:
+            print("Exception caught while trying to generate plot:")
+            print(str(eobj))
+            print("Skipping %s plot." % section)
+
+        plotter.save_file('%s_%s_%s.txt' % (section, local_time(),
+                                            siteUtils.getUnitId()))

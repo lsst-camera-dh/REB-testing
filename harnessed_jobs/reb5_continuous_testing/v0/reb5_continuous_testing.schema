@@ -1,6 +1,6 @@
 # -*- python -*-
 {
-    'schema_name' : 'reb_burn_in_ver_03',
+    'schema_name' : 'reb5_continuous_testing',
     'schema_version' : 0,
     'ccs_subsystem' : str
 }
