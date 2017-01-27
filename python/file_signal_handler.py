@@ -34,8 +34,12 @@ class FileSignalHandler(object):
         ValueError :
             Raised if the directory to contain the signal file does not
             exist.
-        RuntimeError:
-            Raised if the signal file already exists.
+
+        Notes
+        -----
+            Since signals are ideally supposed to be transient events,
+            if the signal file already exists, this constructor will
+            delete it and carry on.
         """
         if signal_file is None:
             signal_file \
@@ -46,9 +50,9 @@ class FileSignalHandler(object):
         dirname = os.path.dirname(signal_file)
         if not os.path.isdir(dirname):
             raise ValueError('Directory %s does not exist' % dirname)
-        # Check that the signal file doesn't alread exist.
+        # Delete the signal file if it already exists.
         if os.path.isfile(signal_file):
-            raise RuntimeError('Signal file %s already exists.' % signal_file)
+            os.remove(signal_file)
         self.signal_file = signal_file
 
     def wait(self, wait_interval, poll_interval=30):
