@@ -10,8 +10,7 @@ import socket
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-#import lcatr.harness.et_wrapper
-import eTraveler.clientAPI.connection
+import lcatr.harness.et_wrapper
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import ccs_trending
@@ -35,27 +34,6 @@ def get_ccs_subsystem(subsystems):
     message = "No CCS subsystem found for REB %s." % siteUtils.getUnitId()
     raise RebTestingException(message)
 
-def get_eT_connection():
-    operator = os.environ['LCATR_OPERATOR']
-    db = os.path.split(os.environ['LCATR_LIMS_URL'])[-1]
-    if db not in 'Prod Dev'.split():
-        # This case occurs when using the fake_eT server, so set db to 'Dev'.
-        db = 'Dev'
-    return eTraveler.clientAPI.connection.Connection(operator=operator, db=db)
-
-def setManufacturerId(manufacturerId):
-    conn = get_eT_connection()
-    experimentSN = os.environ['LCATR_UNIT_ID']
-    htype = os.environ['LCATR_UNIT_TYPE']
-    conn.setManufacturerId(experimentSN=experimentSN, htype=htype,
-                           manufacturerId=manufacturerId)
-
-def getManufacturerId():
-    conn = get_eT_connection()
-    experimentSN = os.environ['LCATR_UNIT_ID']
-    htype = os.environ['LCATR_UNIT_TYPE']
-    return conn.getManufacturerId(experimentSN=experimentSN, htype=htype)
-
 class RebTestingException(RuntimeError):
     "REB-testing exception class"
     pass
@@ -69,8 +47,7 @@ def check_serial_number(ccs_subsystem, board='REB0'):
     print("ccs subsystem:", ccs_subsystem)
     print("manufacturer's S/N from board:", sn_board)
     sys.stdout.flush()
-#    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
-    sn_eT = getManufacturerId()
+    sn_eT = lcatr.harness.et_wrapper.getManufacturerId()
 
     if sn_board != sn_eT:
         message = """The serial number of the installed REB, %s,
