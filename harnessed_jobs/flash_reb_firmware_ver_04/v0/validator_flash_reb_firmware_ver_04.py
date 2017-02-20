@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-# No results or data products, so all the work is done in the producer script.
 import lcatr.schema
-lcatr.schema.write_file([])
+import siteUtils
+
+results = siteUtils.jobInfo()
+lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

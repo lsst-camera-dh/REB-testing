@@ -2,6 +2,7 @@
 import os
 import lcatr.harness.et_wrapper
 import lcatr.schema
+import siteUtils
 import rebUtils
 
 ccs_subsystem = 'ccs-reb5-0'
@@ -19,5 +20,6 @@ print "manufacturerSN set to", manufacturerSN
 results = [lcatr.schema.valid(lcatr.schema.get('sernum_persist_ver_01'),
                               manufacturerSN=manufacturerSN)]
 
+results.extend(siteUtils.jobInfo())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

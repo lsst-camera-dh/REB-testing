@@ -84,6 +84,7 @@ class TsRebProducts(object):
 
 if __name__ == "__main__":
     import lcatr.schema
+    import siteUtils
 
     tsreb_products = TsRebProducts()
 
@@ -92,5 +93,6 @@ if __name__ == "__main__":
     results.append(lcatr.schema.valid(lcatr.schema.get('rebtest_ver_04'),
                                       **tsreb_products.get_results_dict()))
 
+    results.extend(siteUtils.jobInfo())
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()

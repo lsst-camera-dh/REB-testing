@@ -31,5 +31,6 @@ for text_file in glob.glob('*.txt'):
     results.append(fileref.make(text_file,
                                 metadata=md(DATA_PRODUCT=dp_name)))
 
+results.extend(siteUtils.jobInfo())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

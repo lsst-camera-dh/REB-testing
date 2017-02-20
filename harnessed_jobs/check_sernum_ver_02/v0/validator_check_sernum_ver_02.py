@@ -1,4 +1,8 @@
 #!/usr/bin/env python
 import lcatr.schema
-lcatr.schema.write_file([])
+import siteUtils
+
+results = siteUtils.jobInfo()
+
+lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

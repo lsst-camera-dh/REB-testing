@@ -14,5 +14,6 @@ md = siteUtils.DataCatalogMetadata(LSST_NUM=siteUtils.getUnitId())
 results = [lcatr.schema.fileref.make(pdf_report,
                                      metadata=md(DATA_PRODUCT='REB5_REPORT'))]
 
+results.extend(siteUtils.jobInfo())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
