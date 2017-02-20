@@ -94,15 +94,21 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
     print(command)
     sys.stdout.flush()
     for i in range(ntries):
+        print("Attempt #%i to run REB5Test.py" % i)
         try:
             subprocess.check_call(command, shell=True, executable='/bin/bash')
             break
         except subprocess.CalledProcessError as eobj:
+            pass
+    pdf_report = sorted(subprocess.check_output('find . -name \*.pdf -print',
+                                                shell=True).split())[-1]
+    if os.path.isfile(pdf_report):
+        try:
             # Create a hard link to the pdf to the cwd for persisting
             # by the validator script.
-            pdf_report = subprocess.check_output('find . -name \*.pdf -print',
-                                                 shell=True).rstrip()
             os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
+        except OSError as eobj:
+            print("run_REB5Test_script failed:\n", str(eobj))
 
 def run_fake_REB5Test_script():
     """
