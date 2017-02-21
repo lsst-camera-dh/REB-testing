@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
+import lcatr.harness.et_wrapper
 import lcatr.schema
-import eTraveler.clientAPI.connection
+import siteUtils
 import rebUtils
 
 ccs_subsystem = 'ccs-reb5-0'
@@ -9,7 +10,7 @@ ccs_subsystem = 'ccs-reb5-0'
 manufacturerSN = \
     rebUtils.get_serial_number_from_board(ccs_subsystem=ccs_subsystem)
 try:
-    rebUtils.setManufacturerId(manufacturerId=manufacturerSN)
+    lcatr.harness.et_wrapper.setManufacturerId(manufacturerId=manufacturerSN)
 except Exception as eobj:
     print eobj
 
@@ -19,5 +20,6 @@ print "manufacturerSN set to", manufacturerSN
 results = [lcatr.schema.valid(lcatr.schema.get('sernum_persist_ver_01'),
                               manufacturerSN=manufacturerSN)]
 
+results.extend(siteUtils.jobInfo())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

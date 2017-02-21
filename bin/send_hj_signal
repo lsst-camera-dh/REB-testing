@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+"""
+Script to send a file-based signal to a harnessed job.
+"""
+import os
+import argparse
+import file_signal_handler
+
+parser = argparse.ArgumentParser(description='Send a file-based signal to a harnessed job running in the eTraveler.')
+parser.add_argument('job_id', help='Job ID of eTraveler process to signal',
+                    type=int)
+args = parser.parse_args()
+
+signal_file = os.path.join('/tmp', 'hj_signal_%s.txt' % args.job_id)
+handler = file_signal_handler.FileSignalHandler(signal_file)
+handler.send_file_signal()
