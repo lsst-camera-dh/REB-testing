@@ -12,14 +12,17 @@ import os
 import glob
 import shutil
 
-def glob_by_file_extension(*file_exts):
+def glob_by_file_extension(file_exts):
     files = []
+    dp_dir = os.environ['LCATR_REB5_DATA_PRODUCTS_DIR']
     for file_ext in file_exts:
-        files.extend(os.path.join(os.environ['LCATR_REB5_DATA_PRODUCTS_DIR'],
-                                  '*.%s' % file_ext))
+        glob_string = os.path.join(dp_dir, '*.%s' % file_ext)
+        files.extend(glob.glob(glob_string))
     return files
 
 files = glob_by_file_extension('pdf png txt'.split())
 
+print("copying")
 for item in files:
-    shutil.copy(item '.')
+    print(item)
+    shutil.copy(item, os.path.abspath('.'))
