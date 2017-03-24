@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Producer script for persisting data products from REB5 continuous test
-jobs that failed, but which still have useful data.
+jobs that failed but which still have useful data.
 
 This script copies the expected data products to the cwd from the
 directory given in the LCATR_REB5_DATA_PRODUCTS_DIR environment

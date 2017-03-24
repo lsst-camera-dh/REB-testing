@@ -27,6 +27,8 @@ for png_file in glob.glob('*.png'):
                                 metadata=md(DATA_PRODUCT=dp_name)))
 
 for text_file in glob.glob('*.txt'):
+    if text_file == results_file:
+        continue
     dp_name = text_file.split('_')[0] + '_plot_data'
     results.append(fileref.make(text_file,
                                 metadata=md(DATA_PRODUCT=dp_name)))
