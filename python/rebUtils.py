@@ -168,17 +168,17 @@ def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
     for section in config.sections():
         print("  processing", section)
         sys.stdout.flush()
-        plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
-                                               time_axis=time_axis)
-        plotter.read_config(config, section)
         try:
+            plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
+                                                   time_axis=time_axis)
+            plotter.read_config(config, section)
             plotter.plot()
             plt.savefig('%s_%s_%s.png' % (section, local_time(),
                                           siteUtils.getUnitId()))
+            plotter.save_file('%s_%s_%s.txt' % (section, local_time(),
+                                                siteUtils.getUnitId()))
         except StandardError as eobj:
             print("Exception caught while trying to generate plot:")
             print(str(eobj))
             print("Skipping %s plot." % section)
 
-        plotter.save_file('%s_%s_%s.txt' % (section, local_time(),
-                                            siteUtils.getUnitId()))
