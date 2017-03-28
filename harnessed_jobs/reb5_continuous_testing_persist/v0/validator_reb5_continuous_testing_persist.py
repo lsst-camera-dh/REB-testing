@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Validator script for reb5_continuous_testing.
+Validator script for reb5_continuous_testing_persist.
 """
 from __future__ import absolute_import, print_function
 import glob
