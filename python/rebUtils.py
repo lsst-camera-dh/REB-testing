@@ -121,6 +121,23 @@ def run_fake_REB5Test_script():
     with open(fake_report, 'a'):
         os.utime(fake_report, None)
 
+def parse_REB5Test_results_file(results_file):
+    """
+    Parse the text file produced by the REB5Test.py script and return
+    a dictionary of values to be persisted by the validator script to
+    the eTraveler results tables
+    """
+    output = dict()
+    with open(results_file) as input_:
+        for line in input_:
+            tokens = [x.strip() for x in line.split(',')]
+            if tokens[0] == 'PASS':
+                ikey = 1
+            else:
+                ikey = 0
+            output[tokens[ikey].replace(' ', '_')] = tokens[ikey+1]
+    return output
+
 def local_time():
     """
     Return the current local time in ISO-8601 format.
