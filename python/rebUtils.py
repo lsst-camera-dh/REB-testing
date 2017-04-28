@@ -102,11 +102,14 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
             pass
     pdf_report = sorted(subprocess.check_output('find . -name \*.pdf -print',
                                                 shell=True).split())[-1]
-    if os.path.isfile(pdf_report):
+    text_file = sorted(subprocess.check_output('find . -name REB5\*.txt -print',
+                                               shell=True).split())[-1]
+    # Create a hard links to the output files to the cwd for persisting
+    # by the validator script.
+    if os.path.isfile(pdf_report) and os.path.isfile(text_file):
         try:
-            # Create a hard link to the pdf to the cwd for persisting
-            # by the validator script.
             os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
+            os.link(text_file, os.path.join('.', os.path.basename(text_file)))
         except OSError as eobj:
             print("run_REB5Test_script failed:\n", str(eobj))
 
@@ -115,11 +118,13 @@ def run_fake_REB5Test_script():
     Create a fake REB5 Test report.
     """
     fake_report = 'REB5_Test_fake_report_%s.pdf' % local_time()
+    fake_text_file = 'REB5_Test_fake_results_%s.txt' % local_time()
     print("Faking the execution of REB5Test.py, creating the report",
           fake_report)
     sys.stdout.flush()
-    with open(fake_report, 'a'):
-        os.utime(fake_report, None)
+    for item in (fake_report, fake_text_file):
+        with open(item, 'a'):
+            os.utime(item, None)
 
 def parse_REB5Test_results_file(results_file):
     """

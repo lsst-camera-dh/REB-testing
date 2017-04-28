@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'reb5_test_script',
+    'schema_version' : 0,
+    'parameter_name' : str,
+    'test_result' : str
+}
