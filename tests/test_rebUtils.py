@@ -24,6 +24,32 @@ class RebUtilsTestCase(unittest.TestCase):
         self.assertEqual(results['CS_Gate_Test'], 'PASS')
         self.assertEqual(results['ASPIC_Noise_Tests'], 'PASS')
 
+    def test_check_REB_vivado_output(self):
+        "Unit test for the check_REB_vivado_output function."
+        infile = os.path.join(os.environ['REBTESTINGDIR'], 'tests',
+                              'vivado_flash_success.log')
+        rebUtils.check_REB_vivado_output(open(infile).readlines())
+
+        infile = os.path.join(os.environ['REBTESTINGDIR'], 'tests',
+                              'vivado_flash_failure.log')
+        self.assertRaises(rebUtils.RebProgrammingError,
+                          rebUtils.check_REB_vivado_output,
+                          open(infile).readlines())
+
+        expected_lines = ('End of startup status: HIGH',)
+
+        infile = os.path.join(os.environ['REBTESTINGDIR'], 'tests',
+                              'vivado_program_fpga_success.log')
+        rebUtils.check_REB_vivado_output(open(infile).readlines(),
+                                         expected=expected_lines)
+
+        infile = os.path.join(os.environ['REBTESTINGDIR'], 'tests',
+                              'vivado_program_fpga_failure.log')
+        self.assertRaises(rebUtils.RebProgrammingError,
+                          rebUtils.check_REB_vivado_output,
+                          open(infile).readlines(),
+                          expected=expected_lines)
+
 if __name__ == '__main__':
     unittest.main()
 

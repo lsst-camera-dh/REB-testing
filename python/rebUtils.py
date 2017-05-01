@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import datetime
+import logging
 import subprocess
 import socket
 import matplotlib
@@ -14,6 +15,12 @@ import lcatr.harness.et_wrapper
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import ccs_trending
+
+def get_logger(level=logging.INFO):
+    logging.basicConfig(format='%(message)s',
+                        level=level,
+                        stream=sys.stdout)
+    return logging.getLogger()
 
 def get_ccs_subsystem(subsystems):
     """
@@ -207,3 +214,21 @@ def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
             print(str(eobj))
             print("Skipping %s plot." % section)
 
+class RebProgrammingError(RuntimeError):
+    def __init__(self, *args, **kwds):
+        super(RebProgrammingError, self).__init__(*args, **kwds)
+
+def check_REB_vivado_output(lines,
+                            expected=('Erase Operation successful.',
+                                      'Program/Verify Operation successful.',
+                                      'Flash programming completed successfully',
+                                      'Done pin status: HIGH')):
+    expected_text = set(expected)
+    for line in lines:
+        for item in expected:
+            if item in line:
+                expected_text.remove(item)
+    if expected_text:
+        raise RebProgrammingError("Failure flashing REB memory. "
+                                  + "Missing expected lines from vivado.log:\n"
+                                  + '\n'.join(expected_text))
