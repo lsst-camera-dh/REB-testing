@@ -19,10 +19,10 @@ class RebUtilsTestCase(unittest.TestCase):
         self.assertEqual(results['CCS_Path'], 'ccs-reb5-0')
         self.assertEqual(results['BoardID'], '0x18ed9a7b')
         self.assertEqual(results['Link_version'], '032')
-        self.assertEqual(results['Idle_Current'], '15/15 values okay.')
-        self.assertEqual(results['CS_Gate_Test'], 'Gain: 20.512 Offset: 78.811')
-        self.assertEqual(results['ASPIC_Noise_Tests'],
-                         '144/144 channels OK failcount: 0/0/0')
+        self.assertEqual(results['Parameter_Logging'], 'PASS')
+        self.assertEqual(results['Idle_Current'], 'PASS')
+        self.assertEqual(results['CS_Gate_Test'], 'PASS')
+        self.assertEqual(results['ASPIC_Noise_Tests'], 'PASS')
 
 if __name__ == '__main__':
     unittest.main()

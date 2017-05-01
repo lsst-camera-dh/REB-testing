@@ -1,0 +1,3 @@
+#%Module1.0 #-*-tcl-*-#
+source "$::env(LCATR_MODULES)/lcatr.tcl"
+lcatr_package producer_program_fpga_and_load_firmware_ver_01.py validator_program_fpga_and_load_firmware_ver_01.py

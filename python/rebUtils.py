@@ -81,7 +81,8 @@ output.close()
 
 def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
                         script_dir='/lsst/ccs/REBtest',
-                        script_name='REB5Test.py'):
+                        script_name='REB5Test.py',
+                        options="-n -v"):
     """
     Run REB5 test script use for REB burn-in and thermal cycling tests.
     """
@@ -90,7 +91,7 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
         run_fake_REB5Test_script()
         return
     cwd = os.path.abspath('.')
-    command = "cd %(script_dir)s; python %(script_name)s -n -v -C %(ccs_subsystem)s %(cwd)s" % locals()
+    command = "cd %(script_dir)s; python %(script_name)s %(options)s -C %(ccs_subsystem)s %(cwd)s" % locals()
     print(command)
     sys.stdout.flush()
     for i in range(ntries):
@@ -138,9 +139,11 @@ def parse_REB5Test_results_file(results_file):
             tokens = [x.strip() for x in line.split(',')]
             if tokens[0] == 'PASS':
                 ikey = 1
+                ivalue = 0
             else:
                 ikey = 0
-            output[tokens[ikey].replace(' ', '_')] = tokens[ikey+1]
+                ivalue = 1
+            output[tokens[ikey].replace(' ', '_')] = tokens[ivalue]
     return output
 
 def local_time():
