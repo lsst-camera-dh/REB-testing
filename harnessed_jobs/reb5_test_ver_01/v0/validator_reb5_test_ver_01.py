@@ -17,7 +17,7 @@ md = siteUtils.DataCatalogMetadata(LSST_NUM=siteUtils.getUnitId())
 results = [lcatr.schema.fileref.make(pdf_report,
                                      metadata=md(DATA_PRODUCT='REB5_REPORT'))]
 
-test_results = parse_REB5Test_results_file(text_file)
+test_results = rebUtils.parse_REB5Test_results_file(text_file)
 schema = lcatr.schema.get('reb5_test_script_results')
 for key, value in test_results.items():
     results.append(lcatr.schema.valid(schema, parameter_name=key,
