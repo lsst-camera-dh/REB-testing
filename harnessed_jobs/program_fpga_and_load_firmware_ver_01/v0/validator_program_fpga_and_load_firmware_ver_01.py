@@ -3,7 +3,7 @@ import glob
 import lcatr.schema
 import siteUtils
 
-vivado_log_files = glob.glob('vivado*.log')
+vivado_log_files = glob.glob('vivado_f*.log')
 results = [lcatr.schema.fileref.make(log_file) for log_file in vivado_log_files]
 
 results.extend(siteUtils.jobInfo())
