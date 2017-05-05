@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import datetime
+import logging
 import subprocess
 import socket
 import matplotlib
@@ -14,6 +15,12 @@ import lcatr.harness.et_wrapper
 from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import ccs_trending
+
+def get_logger(level=logging.INFO):
+    logging.basicConfig(format='%(message)s',
+                        level=level,
+                        stream=sys.stdout)
+    return logging.getLogger()
 
 def get_ccs_subsystem(subsystems):
     """
@@ -81,7 +88,8 @@ output.close()
 
 def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
                         script_dir='/lsst/ccs/REBtest',
-                        script_name='REB5Test.py'):
+                        script_name='REB5Test.py',
+                        options="-n -v"):
     """
     Run REB5 test script use for REB burn-in and thermal cycling tests.
     """
@@ -90,7 +98,7 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
         run_fake_REB5Test_script()
         return
     cwd = os.path.abspath('.')
-    command = "cd %(script_dir)s; python %(script_name)s -n -v -C %(ccs_subsystem)s %(cwd)s" % locals()
+    command = "cd %(script_dir)s; python %(script_name)s %(options)s -C %(ccs_subsystem)s %(cwd)s" % locals()
     print(command)
     sys.stdout.flush()
     for i in range(ntries):
@@ -102,11 +110,14 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
             pass
     pdf_report = sorted(subprocess.check_output('find . -name \*.pdf -print',
                                                 shell=True).split())[-1]
-    if os.path.isfile(pdf_report):
+    text_file = sorted(subprocess.check_output('find . -name REB5\*.txt -print',
+                                               shell=True).split())[-1]
+    # Create a hard links to the output files to the cwd for persisting
+    # by the validator script.
+    if os.path.isfile(pdf_report) and os.path.isfile(text_file):
         try:
-            # Create a hard link to the pdf to the cwd for persisting
-            # by the validator script.
             os.link(pdf_report, os.path.join('.', os.path.basename(pdf_report)))
+            os.link(text_file, os.path.join('.', os.path.basename(text_file)))
         except OSError as eobj:
             print("run_REB5Test_script failed:\n", str(eobj))
 
@@ -115,11 +126,32 @@ def run_fake_REB5Test_script():
     Create a fake REB5 Test report.
     """
     fake_report = 'REB5_Test_fake_report_%s.pdf' % local_time()
+    fake_text_file = 'REB5_Test_fake_results_%s.txt' % local_time()
     print("Faking the execution of REB5Test.py, creating the report",
           fake_report)
     sys.stdout.flush()
-    with open(fake_report, 'a'):
-        os.utime(fake_report, None)
+    for item in (fake_report, fake_text_file):
+        with open(item, 'a'):
+            os.utime(item, None)
+
+def parse_REB5Test_results_file(results_file):
+    """
+    Parse the text file produced by the REB5Test.py script and return
+    a dictionary of values to be persisted by the validator script to
+    the eTraveler results tables
+    """
+    output = dict()
+    with open(results_file) as input_:
+        for line in input_:
+            tokens = [x.strip() for x in line.split(',')]
+            if tokens[0] == 'PASS':
+                ikey = 1
+                ivalue = 0
+            else:
+                ikey = 0
+                ivalue = 1
+            output[tokens[ikey].replace(' ', '_')] = tokens[ivalue]
+    return output
 
 def local_time():
     """
@@ -182,3 +214,21 @@ def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
             print(str(eobj))
             print("Skipping %s plot." % section)
 
+class RebProgrammingError(RuntimeError):
+    def __init__(self, *args, **kwds):
+        super(RebProgrammingError, self).__init__(*args, **kwds)
+
+def check_REB_vivado_output(lines,
+                            expected=('Erase Operation successful.',
+                                      'Program/Verify Operation successful.',
+                                      'Flash programming completed successfully',
+                                      'Done pin status: HIGH')):
+    expected_text = set(expected)
+    for line in lines:
+        for item in expected:
+            if item in line:
+                expected_text.remove(item)
+    if expected_text:
+        raise RebProgrammingError("Failure flashing REB memory. "
+                                  + "Missing expected lines from vivado.log:\n"
+                                  + '\n'.join(expected_text))

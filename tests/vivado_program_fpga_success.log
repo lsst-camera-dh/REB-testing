@@ -1,0 +1,27 @@
+writing FPGA
+
+****** Vivado v2015.3 (64-bit)
+  **** SW Build 1368829 on Mon Sep 28 20:06:39 MDT 2015
+  **** IP Build 1367837 on Mon Sep 28 08:56:14 MDT 2015
+    ** Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.
+
+source ../fpga_load.tcl
+# open_hw
+# connect_hw_server -url localhost:3121
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+# current_hw_target [get_hw_targets]
+# set_property PARAM.FREQUENCY 30000000 [get_hw_targets]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210308A12659
+# set_property PROGRAM.FILE [lindex $argv 0]  [lindex [get_hw_devices] 0]
+# puts "unsing file"
+unsing file
+# puts [lindex $argv 0]
+/afs/slac/g/lsst/daq/REB_prog_files/REB_v5/reb_v5_daq_v1/reb_v5_2/REB_v5_top_30325002.bit
+# program_hw_devices [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# close_hw_target
+INFO: [Labtoolstcl 44-464] Closing hw_target localhost:3121/xilinx_tcf/Digilent/210308A12659
+# disconnect_hw_server localhost:3121
+# close_hw
+INFO: [Common 17-206] Exiting Vivado at Mon May  1 14:08:17 2017…

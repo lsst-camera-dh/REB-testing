@@ -1,0 +1,24 @@
+CCS Path,ccs-reb5-0
+BoardID,0x18ed9a7b
+BoardType,3
+Link version,032
+FPGA version,5002
+BoardTemp,34.3125
+ScriptVersion,17.04.26.13.07
+time,17.04.26.15.50
+PASS,Parameter Logging,Recorded 13 parameters for 225.802499056 seconds.
+PASS,Idle Current,15/15 values okay.
+PASS,Channel Comms,0/102 channels missing. 0 errors
+PASS,ASPIC Comms,ASPICs communication check
+PASS,CS Gate Test,Gain: 20.512 Offset: 78.811
+PASS,PCK Rails,LV Gain: 0.994 Off: 0.011  UV Gain: 1.001 Off: 0.006  66/66 pass
+PASS,SCK Rails,LV Gain: 1.002 Off: 0.061  UV Gain: 1.000 Off: 0.011  66/66 pass
+PASS,RG Rails,LV Gain: 0.999 Off: 0.049  UV Gain: 1.002 Off: -0.029  66/66 pass
+PASS,"Diverging PCK Rails, 0V",LV Gain: 1.002 Off: 0.041  UV Gain: 0.998 Off: 0.010  34/34 pass
+PASS,"Diverging SCK Rails, 0V",LV Gain: 1.006 Off: 0.077  UV Gain: 0.996 Off: 0.022  34/34 pass
+PASS,"Diverging RG Rails, 0V",LV Gain: 0.999 Off: 0.051  UV Gain: 1.003 Off: -0.043  34/34 pass
+PASS,OG Bias Test,"Gain:(0.976, 0.985, 0.973) Off:(-0.026, 0.015, -0.021) 63/63 pass"
+PASS,OD Bias Test,"Gain:(1.007, 1.007, 1.003) Off:(0.000, 0.134, 0.034) 48/48 pass"
+PASS,GD Bias Test,"Gain:(1.000, 1.000, 1.001) Off:(-0.070, -0.059, 0.009) 48/48 pass"
+PASS,RD Bias Test,"Gain:(0.999, 0.998, 0.998) Off:(0.006, 0.007, 0.027) 48/48 pass"
+PASS,ASPIC Noise Tests,144/144 channels OK failcount: 0/0/0

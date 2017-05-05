@@ -5,12 +5,12 @@ import lcatr.schema
 import siteUtils
 import rebUtils
 
-ccs_subsystem = 'ccs-reb5-0'
+ccs_subsystem = 'ccs-reb5-ts'
 
 manufacturerSN = \
     rebUtils.get_serial_number_from_board(ccs_subsystem=ccs_subsystem)
 try:
-    lcatr.harness.et_wrapper.setManufacturerId(manufacturerId=manufacturerSN)
+    lcatr.harness.et_wrapper.setManufacturerId(manufacturerSN)
 except Exception as eobj:
     print eobj
 
