@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
+import shutil
 import subprocess
+import rebUtils
 
-start_dir = os.path.abspath('.')
-os.chdir('/afs/slac/g/lsst/daq/REB_prog_files')
-command = './prog_fpga.sh fpga ./../../../../../../data/REB_v5_ethernet-20161202.bit'
-print(command)
-subprocess.check_call(command, shell=True)
-os.chdir(start_dir)
+logger = rebUtils.get_logger()
+
+reb_afs_path = '/afs/slac/g/lsst/daq/REB_prog_files'
+prog_fpga = os.path.join(reb_afs_path, 'prog_fpga.sh')
+
+program_file = '/data/REB_v5_ethernet-20170207.bit'
+
+command = '%s fpga %s' % (prog_fpga, program_file)
+logger.info(command)
+
+output = subprocess.check_output(command, shell=True)
+rebUtils.check_REB_vivado_output(output.split('\n'),
+                                 expected=('End of startup status: HIGH',))
+shutil.copy('vivado.log', 'vivado_fpga.log')
