@@ -20,10 +20,6 @@ class FileSignalHandlerTestCase(unittest.TestCase):
     def test_file_signal_handler(self):
         self.assertRaises(ValueError, file_signal_handler.FileSignalHandler,
                           '/foo/bar/foobar.txt')
-        with open(self.signal_file, 'a'):
-            os.utime(self.signal_file, None)
-        self.assertRaises(RuntimeError, file_signal_handler.FileSignalHandler,
-                          self.signal_file)
 
     def test_wait(self):
         handler = file_signal_handler.FileSignalHandler(self.signal_file)

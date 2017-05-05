@@ -37,9 +37,9 @@ class FileSignalHandler(object):
 
         Notes
         -----
-            Since signals are ideally supposed to be transient events,
-            if the signal file already exists, this constructor will
-            delete it and carry on.
+        Since signals are ideally supposed to be transient events, if
+        the signal file already exists, this constructor will delete
+        it and carry on.
         """
         if signal_file is None:
             signal_file \

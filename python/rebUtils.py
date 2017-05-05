@@ -7,6 +7,7 @@ import sys
 import datetime
 import logging
 import subprocess
+import csv
 import socket
 import matplotlib
 matplotlib.use('Agg')
@@ -142,8 +143,8 @@ def parse_REB5Test_results_file(results_file):
     """
     output = dict()
     with open(results_file) as input_:
-        for line in input_:
-            tokens = [x.strip() for x in line.split(',')]
+        csv_reader = csv.reader(input_, delimiter=',', quotechar='"')
+        for tokens in csv_reader:
             if tokens[0] == 'PASS':
                 ikey = 1
                 ivalue = 0
