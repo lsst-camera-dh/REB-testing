@@ -10,7 +10,7 @@ logger = rebUtils.get_logger()
 reb_afs_path = '/afs/slac/g/lsst/daq/REB_prog_files'
 prog_fpga = os.path.join(reb_afs_path, 'prog_fpga.sh')
 
-program_file = '/data/REB_v5_ethernet-20170207.bit'
+program_file = os.path.join(reb_afs_path, 'REB_v5_ethernetFW.bit')
 
 command = '%s fpga %s' % (prog_fpga, program_file)
 logger.info(command)
