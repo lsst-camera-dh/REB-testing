@@ -145,7 +145,7 @@ def parse_REB5Test_results_file(results_file):
     with open(results_file) as input_:
         csv_reader = csv.reader(input_, delimiter=',', quotechar='"')
         for tokens in csv_reader:
-            if tokens[0] == 'PASS':
+            if tokens[0] in ('PASS', 'FAIL'):
                 ikey = 1
                 ivalue = 0
             else:
@@ -161,7 +161,7 @@ def local_time():
     return datetime.datetime.now().isoformat()[:len('2017-01-24T10:44:00')]
 
 def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
-                            nbins=None, config_file=None):
+                            nbins=1000, config_file=None):
     """
     Make trending plots.
 
@@ -177,8 +177,8 @@ def make_ccs_trending_plots(ccs_subsystem, dt=None, start=None, end=None,
     end : str, optional
         End of time interval. ISO-8601 format.
     nbins : int, optional
-        Number of bins for time axis.  Automatically chosen by RESTful
-        server if not given.
+        Number of bins for time axis.  If None, then automatically chosen
+        by RESTful server.  Default: 1000.
     config_file : str, optional
         Configuration file listing the trending quantities to plot.
         If None (default), then use the config file in

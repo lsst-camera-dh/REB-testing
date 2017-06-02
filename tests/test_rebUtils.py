@@ -24,6 +24,7 @@ class RebUtilsTestCase(unittest.TestCase):
         self.assertEqual(results['CS_Gate_Test'], 'PASS')
         self.assertEqual(results['ASPIC_Noise_Tests'], 'PASS')
         self.assertEqual(results['Diverging_PCK_Rails,_0V'], 'PASS')
+        self.assertEqual(results['OG_Bias_Test'], 'FAIL')
 
     def test_check_REB_vivado_output(self):
         "Unit test for the check_REB_vivado_output function."
