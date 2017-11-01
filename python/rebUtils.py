@@ -17,6 +17,17 @@ from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import ccs_trending
 
+def get_reb_type(component_type=None):
+    """
+    Return the type of REB given the component type.
+    """
+    reb_types = {'LCA-13574': 'REB5',
+                 'LCA-13537': 'WREB',
+                 'LCA-13540': 'GREB'}
+    if component_type is None:
+        component_type = os.environ['LCATR_UNIT_TYPE']
+    return reb_types[component_type]
+
 def get_logger(level=logging.INFO):
     logging.basicConfig(format='%(message)s',
                         level=level,
@@ -89,21 +100,26 @@ output.close()
 
 def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
                         script_dir='/lsst/ccs/REBtest',
-                        script_name='REB5Test.py',
+                        script_name=None,
+                        reb_type='REB5',
                         options="-n -v"):
     """
-    Run REB5 test script use for REB burn-in and thermal cycling tests.
+    Run test script used for REB burn-in and thermal cycling tests.
     """
     # Run fake test for debugging if desired.
     if os.environ.has_key('LCATR_REB5_FAKE_TEST'):
-        run_fake_REB5Test_script()
+        run_fake_REB5Test_script(reb_type)
         return
+
+    if script_name is None:
+        script_name = '%sTest.py' % reb_type
+
     cwd = os.path.abspath('.')
     command = "cd %(script_dir)s; python %(script_name)s %(options)s -C %(ccs_subsystem)s %(cwd)s" % locals()
     print(command)
     sys.stdout.flush()
     for i in range(ntries):
-        print("Attempt #%i to run REB5Test.py" % i)
+        print("Attempt #%i to run %s" % (i, script_name))
         try:
             subprocess.check_call(command, shell=True, executable='/bin/bash')
             break
@@ -111,7 +127,8 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
             pass
     pdf_report = sorted(subprocess.check_output('find . -name \*.pdf -print',
                                                 shell=True).split())[-1]
-    text_file = sorted(subprocess.check_output('find . -name REB5\*.txt -print',
+    text_file = sorted(subprocess.check_output('find . -name %s\*.txt -print'
+                                               % reb_type,
                                                shell=True).split())[-1]
     # Create a hard links to the output files to the cwd for persisting
     # by the validator script.
@@ -122,13 +139,13 @@ def run_REB5Test_script(ccs_subsystem, ntries=5, wait_time=60,
         except OSError as eobj:
             print("run_REB5Test_script failed:\n", str(eobj))
 
-def run_fake_REB5Test_script():
+def run_fake_REB5Test_script(reb_type='REB5'):
     """
     Create a fake REB5 Test report.
     """
-    fake_report = 'REB5_Test_fake_report_%s.pdf' % local_time()
-    fake_text_file = 'REB5_Test_fake_results_%s.txt' % local_time()
-    print("Faking the execution of REB5Test.py, creating the report",
+    fake_report = '%s_Test_fake_report_%s.pdf' % (reb_type, local_time())
+    fake_text_file = '%s_Test_fake_results_%s.txt' % (reb_type, local_time())
+    print("Faking the execution of %sTest.py, creating the report" % reb_type,
           fake_report)
     sys.stdout.flush()
     for item in (fake_report, fake_text_file):
@@ -137,9 +154,9 @@ def run_fake_REB5Test_script():
 
 def parse_REB5Test_results_file(results_file):
     """
-    Parse the text file produced by the REB5Test.py script and return
-    a dictionary of values to be persisted by the validator script to
-    the eTraveler results tables
+    Parse the text file produced by the [REB5,WREB,GREB]Test.py script
+    and return a dictionary of values to be persisted by the validator
+    script to the eTraveler results tables
     """
     output = dict()
     with open(results_file) as input_:
