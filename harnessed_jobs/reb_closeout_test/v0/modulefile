@@ -1,3 +1,3 @@
 #%Module1.0 #-*-tcl-*-#
 source "$::env(LCATR_MODULES)/lcatr.tcl"
-lcatr_package producer_reb5_closeout_test.py validator_reb5_closeout_test.py
+lcatr_package producer_reb_closeout_test.py validator_reb_closeout_test.py
