@@ -11,8 +11,8 @@ import file_signal_handler
 
 reb_type = rebUtils.get_reb_type()
 
-subsystems = ['ccs-reb5-%i' % i for i in range(3)]
-ccs_subsystem = rebUtils.get_ccs_subsystem(subsystems)
+# Write the ccs_subsystem to the text file.
+ccs_subsystem = 'ccs-%s' % reb_type.lower()
 results_file = 'ccs_subsystem_info.txt'
 with open(results_file, 'w') as output:
     output.write(ccs_subsystem + '\n')
