@@ -35,4 +35,7 @@ except file_signal_handler.FileSignalHandlerException:
     pass
 
 elapsed_hours = (time.time() - tstart)/3600.
-rebUtils.make_ccs_trending_plots(ccs_subsystem, dt=elapsed_hours)
+config_file = os.path.join(os.environ['REBTESTINGDIR'], 'data',
+                           '%s_trending_plot.cfg' % reb_type)
+rebUtils.make_ccs_trending_plots(ccs_subsystem, dt=elapsed_hours,
+                                 config_file=config_file)
